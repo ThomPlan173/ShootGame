@@ -22,7 +22,7 @@ public class MyGdxGame extends ApplicationAdapter {
 	public void render() {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		shape.begin(ShapeRenderer.ShapeType.Filled);
-		//shape.end();
+		shape.end();
 	}
 
 
