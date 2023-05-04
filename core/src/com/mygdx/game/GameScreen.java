@@ -28,10 +28,11 @@ public class GameScreen implements Screen {
 
     private Bucket bucket;
 
+    private Bullet bullet;
 
     private Array<Drop> raindrops;
     private long lastDropTime;
-    private int dropsGathered;
+    private int dropsGathered = 10;
     Rectangle shape ;
 
     // Dans ce constructeur : il y a des chiffres en dur -> on peut surement faire mieux !!!
@@ -49,6 +50,8 @@ public class GameScreen implements Screen {
 
         // create the raindrops array and spawn the first raindrop
         raindrops = new Array<Drop>();
+
+        bullet = new Bullet();
     }
 
     // Dans cette méthode il y a des chiffres en dur : on peut surement faire mieux !!!
@@ -71,7 +74,7 @@ public class GameScreen implements Screen {
             if (raindrop.shape.y + 64 < 0)
                 iter.remove();
             if (Intersector.overlaps(raindrop.shape, bucket.shape)) {
-                dropsGathered++;
+                dropsGathered--;
                 iter.remove();
             }
         }
@@ -87,11 +90,16 @@ public class GameScreen implements Screen {
 
         // Modification des coordonnées du bucket (avec celles de la souris)
         bucket.shape.setX(touchPos.x - bucket.shape.width / 2);
+        bucket.shape.setY(touchPos.y - bucket.shape.height / 2);
 
-        // ... em pêcher que le bucket sorte de l'écran
+        // ... empêcher que le bucket sorte de l'écran
         if (bucket.shape.x < 0) bucket.shape.setX(0);
         if (bucket.shape.x > camera.viewportWidth - bucket.shape.width)
             bucket.shape.setX( camera.viewportWidth - bucket.shape.width);
+
+        if (bucket.shape.y < 0) bucket.shape.setY(0);
+        if (bucket.shape.y > camera.viewportHeight - bucket.shape.height)
+            bucket.shape.setY( camera.viewportHeight - bucket.shape.height);
 
         // On génère une nouvelle goutte toutes les 1000000000 ns
         if (TimeUtils.nanoTime() - lastDropTime > 1000000000) spawnRaindrop();
@@ -110,6 +118,7 @@ public class GameScreen implements Screen {
         // Calcul des collisions
         checkCollisions();
 
+
         // tell the SpriteBatch to render in the
         // coordinate system specified by the camera.
         camera.update();
@@ -119,7 +128,7 @@ public class GameScreen implements Screen {
         game.batch.begin();
 
         // Affichage du texte
-        game.font.draw(game.batch, "Drops Collected: " + dropsGathered, 0, 480);
+        game.font.draw(game.batch, "Nombre de vies restantes : " + dropsGathered, 0, 480);
 
         // Affichage du bucket
         bucket.draw(game.batch) ;
@@ -128,6 +137,7 @@ public class GameScreen implements Screen {
         for (Drop raindrop : raindrops) {
             raindrop.draw(game.batch);
         }
+        bullet.draw(game.batch);
 
         // Fin des affichages
         game.batch.end();
