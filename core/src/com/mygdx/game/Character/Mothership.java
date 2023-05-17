@@ -1,4 +1,4 @@
-package com.mygdx.game.Character;
+/*package com.mygdx.game.Character;
 
 public class Mothership extends Ennemi {
 
@@ -12,4 +12,4 @@ public class Mothership extends Ennemi {
     }
 
 
-}
+}*/

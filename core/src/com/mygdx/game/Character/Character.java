@@ -1,28 +1,23 @@
 package com.mygdx.game.Character;
 
+import com.mygdx.game.bullet.Bullet;
+
 public class Character {
 
-    private static String MSG_ALIVE = "(ALIVE)";
-    private static String MSG_DEAD = "(DEAD)";
-
+    private final static String MSG_ALIVE = "(ALIVE)";
+    private final static String MSG_DEAD = "(DEAD)";
     private String name;
-
     private String xp;
-
     private int maxLife, life;
+    private Bullet bullet;
 
-    private Weapon weapon;
+    public Character( String name, int maxLife, int damage, Bullet bullet) {
 
-    public Character(String name, int maxLife, int damage, Weapon weapon) {
         this.name = name;
         this.maxLife = maxLife;
         this.life = maxLife;
-        this.weapon = weapon;
-        this.weapon.setDamage(damage);
-    }
-
-    public Character(String name) {
-        this.name = name;
+        this.bullet = bullet;
+        this.bullet.setDamage(damage);
     }
 
     public String getXp() {
@@ -66,7 +61,7 @@ public class Character {
     }
 
     public void attack(Character character) {
-        int damage = weapon.getDamage();
+        int damage = bullet.getDamage();
         if (isAlive()) {
             System.out.printf("%s attacks %s for %d damage.\n", getName(), character.getName(), damage);
             character.takeDamage(damage);
@@ -84,16 +79,16 @@ public class Character {
         }
     }
 
-    public Weapon getWeapon() {
-        return weapon;
+    public  Bullet getbullet() {
+        return bullet;
     }
 
-    public void setWeapon(Weapon weapon) {
-        this.weapon = weapon;
+    public void setbullet(Bullet bullet) {
+        this.bullet = bullet;
     }
 
     @Override
     public String toString() {
-        return String.format("%s has %d/%d life, %s weapon equipped", getName(), getLife(), getMaxLife(), weapon.toString());
+        return String.format("%s has %d/%d life, %s bullet equipped", getName(), getLife(), getMaxLife(), bullet.toString());
     }
 }

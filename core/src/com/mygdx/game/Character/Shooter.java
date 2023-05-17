@@ -1,4 +1,4 @@
-package com.mygdx.game.Character;
+/* package com.mygdx.game.Character;
 
 public class Shooter extends Ennemi {
 
@@ -12,5 +12,5 @@ public class Shooter extends Ennemi {
     }
 
 
-}
+}*/
 

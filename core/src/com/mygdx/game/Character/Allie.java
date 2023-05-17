@@ -1,12 +1,14 @@
 package com.mygdx.game.Character;
 
 import com.mygdx.game.Character.Character;
+import com.mygdx.game.bullet.Bullet;
+
 public class Allie extends Character {
 
     private int attackPower;
 
-    public Allie(String name, int maxLife, int attackPower) {
-        super(name);
+    public Allie(String name, int maxLife, int attackPower, Bullet bullet) {
+        super(name,maxLife,attackPower, bullet);
         setMaxLife(maxLife);
         setLife(maxLife);
         this.attackPower = attackPower;

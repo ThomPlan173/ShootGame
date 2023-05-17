@@ -1,4 +1,4 @@
-package com.mygdx.game.Character;
+/*package com.mygdx.game.Character;
 
 public class Interceptor extends Ennemi {
 
@@ -7,9 +7,7 @@ public class Interceptor extends Ennemi {
 
     private Weapon weapon = new Weapon("Bomber weapon", INTERCEPTOR_DAMAGE, INTERCEPTOR_FIRE_RATE);
 
-    public Interceptor(String name, int maxLife, int damage, Weapon weapon) {
-        super(name, maxLife, damage, weapon);
+    public Interceptor(String name, int maxLife, int damage, Bullet bullet) {
+        super(name, maxLife, damage, bullet);
     }
-
-
-}
+}*/
