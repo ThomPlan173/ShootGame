@@ -3,146 +3,173 @@ package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.mygdx.game.bullet.Bullet;
+import com.mygdx.game.bullet.Drop;
+import com.mygdx.game.character.Ship;
+import com.mygdx.game.character.Shooter;
 
 import java.util.Iterator;
-
-/*
-    Ce code est librement inspiré du tutoriel officiel de LibGDX
-    disponible ici : https://libgdx.com/wiki/start/a-simple-game
-    -> le code ci-dessous doit subir de nombreuses améliorations !!!
- */
 
 public class GameScreen implements Screen {
     private final DropGame game;
 
     private OrthographicCamera camera;
+    private SpriteBatch batch;
 
-    private Bucket bucket;
+    private Ship bucket;
+    private Array<Drop> drops;
+    private long lastDropTime;
+    private int dropsGathered = 0;
 
     private Bullet bullet;
+    private Shooter[] shooters; // Tableau de shooters
 
-    private Array<Drop> raindrops;
-    private long lastDropTime;
-    private int dropsGathered = 10;
-    Rectangle shape ;
-
-    // Dans ce constructeur : il y a des chiffres en dur -> on peut surement faire mieux !!!
     public GameScreen(final DropGame game) {
         this.game = game;
         this.game.addScreen(this);
 
         camera = new OrthographicCamera();
-        camera.setToOrtho(false, 800, 480);
+        camera.setToOrtho(false, 1920, 1080);
 
-        bucket = new Bucket();
+        batch = new SpriteBatch();
 
-        bucket.shape.setX(camera.viewportWidth / 2 - bucket.shape.getWidth() / 2); // center the bucket horizontally
-        bucket.shape.setY(20); // bottom left corner of the bucket is 20 pixels above the bottom screen edge
+        bucket = new Ship();
+        bucket.shape.x = camera.viewportWidth / 2 - bucket.shape.width / 2;
+        bucket.shape.y = 20;
 
-        // create the raindrops array and spawn the first raindrop
-        raindrops = new Array<Drop>();
+        drops = new Array<Drop>();
 
         bullet = new Bullet();
+        bullet.setVelocity(200, 300);
+
+        shooters = new Shooter[4]; // Tableau de 4 shooters
+
+        for (int i = 0; i < 4; i++) {
+            shooters[i] = new Shooter();
+            shooters[i].shape.x = MathUtils.random(0, 800 - shooters[i].shape.width);
+            shooters[i].shape.y = MathUtils.random(200, 480 - shooters[i].shape.height);
+            // Les autres paramètres du shooter, comme la vitesse et l'intervalle de tir, peuvent être initialisés ici
+        }
     }
 
-    // Dans cette méthode il y a des chiffres en dur : on peut surement faire mieux !!!
     private void spawnRaindrop() {
         Drop raindrop = new Drop();
         raindrop.shape.x = MathUtils.random(0, 800 - 64);
         raindrop.shape.y = 480;
         raindrop.shape.width = 64;
         raindrop.shape.height = 64;
-        raindrops.add(raindrop);
+        drops.add(raindrop);
         lastDropTime = TimeUtils.nanoTime();
     }
 
-    // Dans cette méthode il y a des chiffres en dur : on peut surement faire mieux !!!
-    private void checkCollisions(){
-        Iterator<Drop> iter = raindrops.iterator();
+    private void checkCollisions() {
+        Iterator<Drop> iter = drops.iterator();
         while (iter.hasNext()) {
             Drop raindrop = iter.next();
             raindrop.shape.y -= 200 * Gdx.graphics.getDeltaTime();
-            if (raindrop.shape.y + 64 < 0)
+            if (raindrop.shape.y + 64 < 0) {
                 iter.remove();
+            }
             if (Intersector.overlaps(raindrop.shape, bucket.shape)) {
-                dropsGathered--;
+                dropsGathered++;
                 iter.remove();
             }
         }
     }
 
-    // Dans cette méthode il y a des chiffres en dur : on peut surement faire mieux !!!
-    private void update(){
-
-        // Récupération des coordonnées de la souris
+    private void update(float delta) {
         Vector3 touchPos = new Vector3();
         touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
         camera.unproject(touchPos);
 
-        // Modification des coordonnées du bucket (avec celles de la souris)
-        bucket.shape.setX(touchPos.x - bucket.shape.width / 2);
-        bucket.shape.setY(touchPos.y - bucket.shape.height / 2);
+        bucket.shape.x = touchPos.x - bucket.shape.width / 2;
 
-        // ... empêcher que le bucket sorte de l'écran
-        if (bucket.shape.x < 0) bucket.shape.setX(0);
-        if (bucket.shape.x > camera.viewportWidth - bucket.shape.width)
-            bucket.shape.setX( camera.viewportWidth - bucket.shape.width);
+        if (bucket.shape.x < 0) {
+            bucket.shape.x = 0;
+        }
+        if (bucket.shape.x > camera.viewportWidth - bucket.shape.width) {
+            bucket.shape.x = camera.viewportWidth - bucket.shape.width;
+        }
 
-        if (bucket.shape.y < 0) bucket.shape.setY(0);
-        if (bucket.shape.y > camera.viewportHeight - bucket.shape.height)
-            bucket.shape.setY( camera.viewportHeight - bucket.shape.height);
+        if (TimeUtils.nanoTime() - lastDropTime > 10005000) {
+            spawnRaindrop();
+        }
 
-        // On génère une nouvelle goutte toutes les 1000000000 ns
-        if (TimeUtils.nanoTime() - lastDropTime > 1000000000) spawnRaindrop();
+        bullet.update(delta);
 
+        for (Shooter shooter : shooters) {
+            shooter.update(delta);
+
+            // Vérifier les collisions avec les autres shooters
+            for (Shooter otherShooter : shooters) {
+                if (shooter != otherShooter && Intersector.overlaps(shooter.shape, otherShooter.shape)) {
+                    // Changer la direction du shooter pour éviter la collision
+                    shooter.changeDirection();
+                }
+
+                // Vérifier la distance minimale entre les shooters
+                float minDistance = 100f; // Distance minimale souhaitée entre les shooters
+                if (shooter != otherShooter) {
+                    float distanceX = shooter.shape.x - otherShooter.shape.x;
+                    float distanceY = shooter.shape.y - otherShooter.shape.y;
+                    float distance = (float) Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+
+                    if (distance < minDistance) {
+                        // Calculer le vecteur de déplacement pour s'éloigner de l'autre shooter
+                        float deltaX = (distanceX / distance) * (minDistance - distance);
+                        float deltaY = (distanceY / distance) * (minDistance - distance);
+
+                        // Déplacer le shooter pour s'éloigner de l'autre shooter
+                        shooter.shape.x += deltaX;
+                        shooter.shape.y += deltaY;
+                    }
+                }
+            }
+        }
+        checkCollisions();
+
+        for (Drop drop : drops) {
+            if (!drop.isActive()) {
+                // Sélectionner un shooter aléatoire pour le tir
+                int randomShooterIndex = MathUtils.random(0, shooters.length - 1);
+                Shooter randomShooter = shooters[randomShooterIndex];
+                // Activer le drop à partir de la position du shooter sélectionné
+                drop.activate(randomShooter.shape.x + randomShooter.shape.width / 2 - drop.shape.width / 2, randomShooter.shape.y);
+                randomShooter.setMovementSpeed(randomShooter.getMovementSpeed() + MathUtils.random(-50, 50));
+
+                break;
+            }
+        }
     }
+
 
     @Override
     public void render(float delta) {
-
-        // Nettoyage de l'écran
         ScreenUtils.clear(0, 0, 0.2f, 1);
 
-        // Calcul des coordonnées des objets de la scène
-        this.update();
+        update(delta);
 
-        // Calcul des collisions
-        checkCollisions();
-
-
-        // tell the SpriteBatch to render in the
-        // coordinate system specified by the camera.
         camera.update();
-        game.batch.setProjectionMatrix(camera.combined);
+        batch.setProjectionMatrix(camera.combined);
 
-        // Démarrage des affichages
-        game.batch.begin();
-
-        // Affichage du texte
-        game.font.draw(game.batch, "Nombre de vies restantes : " + dropsGathered, 0, 480);
-
-        // Affichage du bucket
-        bucket.draw(game.batch) ;
-
-        // Affichage des drop
-        for (Drop raindrop : raindrops) {
-            raindrop.draw(game.batch);
+        batch.begin();
+        game.font.draw(batch, "Nombre de gouttes récupérées : " + dropsGathered, 0, 480);
+        bucket.draw(batch);
+        for (Drop raindrop : drops) {
+            raindrop.draw(batch);
         }
-        bullet.draw(game.batch);
-
-        // Fin des affichages
-        game.batch.end();
-
-
+        bullet.draw(batch);
+        for (Shooter shooter : shooters) {
+            shooter.draw(batch);
+        }
+        batch.end();
     }
 
     @Override
@@ -151,26 +178,24 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
-        // start the playback of the background music
-        // when the screen is shown
-//        rainMusic.play();
     }
 
-    // Du fait que la classe implements Screen, on doit implémenter
-    // les méthodes suivantes : même si on les laisse vides...
     @Override
-    public void hide() {}
-    @Override
-    public void pause() {}
-    @Override
-    public void resume() {}
+    public void hide() {
+    }
 
     @Override
-    // A la fin du jeu, il est important de bien vider la mémoire de l'ordi
-    // en "disposant" les ressources allouées (en particulier pour les textures)
+    public void pause() {
+    }
+
+    @Override
+    public void resume() {
+    }
+
+    @Override
     public void dispose() {
-        Bucket.texture.dispose();
+        Ship.texture.dispose();
         Drop.texture.dispose();
+        batch.dispose();
     }
-
 }

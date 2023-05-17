@@ -1,14 +1,13 @@
-package com.mygdx.game.Character;
+package com.mygdx.game.character;
 
-import com.mygdx.game.Character.Character;
+import com.mygdx.game.bullet.Bullet;
+
 public class Allie extends Character {
 
     private int attackPower;
 
-    public Allie(String name, int maxLife, int attackPower) {
-        super(name);
-        setMaxLife(maxLife);
-        setLife(maxLife);
+    public Allie(String name, int maxLife, int attackPower, Bullet bullet) {
+        super(name, maxLife, 0, bullet);
         this.attackPower = attackPower;
     }
 
@@ -26,4 +25,3 @@ public class Allie extends Character {
         System.out.println(getName() + " attaque " + ennemi.getName() + " et lui inflige " + damage + " points de dégâts !");
     }
 }
-

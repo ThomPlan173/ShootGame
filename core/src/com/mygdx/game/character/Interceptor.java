@@ -1,4 +1,4 @@
-package com.mygdx.game.Character;
+package com.mygdx.game.character;
 
 public class Interceptor extends Ennemi {
 
