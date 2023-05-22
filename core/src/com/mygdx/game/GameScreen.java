@@ -20,13 +20,11 @@ import java.util.Iterator;
 
 public class GameScreen implements Screen {
     private final DropGame game;
-
     private OrthographicCamera camera;
     private SpriteBatch batch;
-
     private Ship ship;
 
-    private Ship bucket;
+
     private Character character;
     private Array<Drop> drops;
     private long lastDropTime;
@@ -45,9 +43,7 @@ public class GameScreen implements Screen {
         batch = new SpriteBatch();
         ship = new Ship();
 
-        bucket = new Ship();
-        bucket.shape.x = camera.viewportWidth / 2 - bucket.shape.width / 2;
-        bucket.shape.y = 20;
+
 
         drops = new Array<Drop>();
 
@@ -82,10 +78,6 @@ public class GameScreen implements Screen {
             if (raindrop.shape.y + 64 < 0) {
                 iter.remove();
             }
-            if (Intersector.overlaps(raindrop.shape, bucket.shape)) {
-                dropsGathered++;
-                iter.remove();
-            }
         }
     }
 
@@ -94,23 +86,18 @@ public class GameScreen implements Screen {
         touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
         camera.unproject(touchPos);
 
-        bucket.shape.x = touchPos.x - bucket.shape.width / 2;
+
         // Modification des coordonnées du ship (avec celles de la souris)
         ship.shape.setX(touchPos.x - ship.shape.width / 2);
         ship.shape.setY(touchPos.y - ship.shape.height / 2);
 
-        if (bucket.shape.x < 0) {
-            bucket.shape.x = 0;
-        }
-        if (bucket.shape.x > camera.viewportWidth - bucket.shape.width) {
-            bucket.shape.x = camera.viewportWidth - bucket.shape.width;
-        }
+
         // ... empêcher que le ship sorte de l'écran
         if (ship.shape.x < 0) ship.shape.setX(0);
         if (ship.shape.x > camera.viewportWidth - ship.shape.width)
             ship.shape.setX( camera.viewportWidth - ship.shape.width);
 
-        if (TimeUtils.nanoTime() - lastDropTime > 10005000) {
+        if (TimeUtils.nanoTime() - lastDropTime > 100000000) {
             spawnRaindrop();
         }
         if (ship.shape.y < 0) ship.shape.setY(0);
@@ -178,14 +165,11 @@ public class GameScreen implements Screen {
         // Démarrage des affichages
         game.batch.begin();
 
-
-
         // Affichage du ship
         ship.draw(game.batch) ;
         game.batch.end();
         batch.begin();
         game.font.draw(batch, "Nombre de gouttes récupérées : " + dropsGathered, 0, 480);
-        bucket.draw(batch);
         for (Drop raindrop : drops) {
             raindrop.draw(batch);
         }
