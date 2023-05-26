@@ -2,13 +2,30 @@ package com.mygdx.game.character;
 
 import com.mygdx.game.bullet.Bullet;
 
-public abstract class  Character {
+public abstract class Character {
 
     private final static String MSG_ALIVE = "(ALIVE)";
     private final static String MSG_DEAD = "(DEAD)";
     public Bullet bullet;
     private String name;
 
+    public int getxSpeed() {
+        return xSpeed;
+    }
+
+    public void setxSpeed(int xSpeed) {
+        this.xSpeed = xSpeed;
+    }
+
+    public int getySpeed() {
+        return ySpeed;
+    }
+
+    public void setySpeed(int ySpeed) {
+        this.ySpeed = ySpeed;
+    }
+
+    private int xSpeed, ySpeed;
     private int maxLife, life;
 
 

@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.mygdx.game.bullet.Bullet;
 import com.mygdx.game.bullet.Drop;
+import com.mygdx.game.character.Allie;
 import com.mygdx.game.character.Ship;
 import com.mygdx.game.character.Shooter;
 import com.mygdx.game.bullet.Bullet;
@@ -24,13 +25,17 @@ public class GameScreen implements Screen {
     private SpriteBatch batch;
     private Ship ship;
 
-
     private Character character;
     private Array<Drop> drops;
     private long lastDropTime;
     private int dropsGathered = 0;
 
+    private long lastBulletTime = 0;
+    private Allie allie;
+    private int actualLife;
     private Bullet bullet;
+    private Array<Drop> raindrops;
+    private Array<Bullet> bulletTirs;
     private Shooter[] shooters; // Tableau de shooters
 
     public GameScreen(final DropGame game) {
@@ -43,31 +48,39 @@ public class GameScreen implements Screen {
         batch = new SpriteBatch();
         ship = new Ship();
 
-
-
         drops = new Array<Drop>();
+        bulletTirs = new Array<>();
 
         bullet = new Bullet();
         bullet.setVelocity(200, 300);
+
+        allie = new Allie("thomas", 20, 10, bullet);
+        actualLife = allie.getMaxLife();
 
         shooters = new Shooter[4]; // Tableau de 4 shooters
 
         for (int i = 0; i < 4; i++) {
             shooters[i] = new Shooter();
-            shooters[i].shape.x = MathUtils.random(0, 800 - shooters[i].shape.width);
-            shooters[i].shape.y = MathUtils.random(200, 480 - shooters[i].shape.height);
+            shooters[i].shape.x = MathUtils.random(0, 1920 - shooters[i].shape.width);
+            shooters[i].shape.y = MathUtils.random(200, 1080 - shooters[i].shape.height);
             // Les autres paramètres du shooter, comme la vitesse et l'intervalle de tir, peuvent être initialisés ici
         }
     }
 
     private void spawnRaindrop() {
         Drop raindrop = new Drop();
-        raindrop.shape.x = MathUtils.random(0, 800 - 64);
-        raindrop.shape.y = 480;
+        raindrop.shape.x = MathUtils.random(0, 1920 - 64);
+        raindrop.shape.y = 1080;
         raindrop.shape.width = 64;
         raindrop.shape.height = 64;
         drops.add(raindrop);
         lastDropTime = TimeUtils.nanoTime();
+    }
+    private void spawnBullet() {
+
+        Bullet newBullet = new Bullet(bullet.getDamage(), ship.shape.x - (ship.shape.getHeight()/2), ship.shape.y - (ship.shape.getHeight()/2), bullet.getSize(), 10, 0);
+        bulletTirs.add(newBullet);
+        lastBulletTime = TimeUtils.nanoTime();
     }
 
     private void checkCollisions() {
@@ -78,9 +91,22 @@ public class GameScreen implements Screen {
             if (raindrop.shape.y + 64 < 0) {
                 iter.remove();
             }
+            if (Intersector.overlaps(raindrop.shape, ship.shape)) {
+                actualLife--;
+                iter.remove();
+            }
         }
     }
-
+    private void checkTirs() {
+        Iterator<Bullet> iterBull = bulletTirs.iterator();
+        while (iterBull.hasNext()) {
+            Bullet bulletTir = iterBull.next();
+            bulletTir.shape.y += 25;
+            if (bulletTir.shape.y > 1080) {
+                iterBull.remove();
+            }
+        }
+    }
     private void update(float delta) {
         Vector3 touchPos = new Vector3();
         touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
@@ -97,9 +123,14 @@ public class GameScreen implements Screen {
         if (ship.shape.x > camera.viewportWidth - ship.shape.width)
             ship.shape.setX( camera.viewportWidth - ship.shape.width);
 
-        if (TimeUtils.nanoTime() - lastDropTime > 100000000) {
+        long timeDiff = TimeUtils.nanoTime() - lastDropTime;
+        if (timeDiff > 1000000000){
             spawnRaindrop();
+            spawnBullet();
         }
+        checkCollisions();
+        checkTirs();
+
         if (ship.shape.y < 0) ship.shape.setY(0);
         if (ship.shape.y > camera.viewportHeight - ship.shape.height)
             ship.shape.setY( camera.viewportHeight - ship.shape.height);
@@ -135,7 +166,7 @@ public class GameScreen implements Screen {
                 }
             }
         }
-        checkCollisions();
+
 
         for (Drop drop : drops) {
             if (!drop.isActive()) {
@@ -167,17 +198,25 @@ public class GameScreen implements Screen {
 
         // Affichage du ship
         ship.draw(game.batch) ;
+        game.font.draw(game.batch, "Life: " + actualLife, 20, 1080 - 20);
         game.batch.end();
         batch.begin();
-        game.font.draw(batch, "Nombre de gouttes récupérées : " + dropsGathered, 0, 480);
         for (Drop raindrop : drops) {
             raindrop.draw(batch);
         }
-        bullet.draw(batch);
+
+        for (Bullet bullet : bulletTirs) {
+            bullet.draw(batch);
+        }
+
         for (Shooter shooter : shooters) {
             shooter.draw(batch);
         }
         batch.end();
+        if (actualLife <= 0) {
+            //game.setScreen(new GameOverScreen(game));
+            dispose();
+        }
     }
 
     @Override
