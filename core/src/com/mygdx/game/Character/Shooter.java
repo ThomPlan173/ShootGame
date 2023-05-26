@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.bullet.Drop;
 
-public class Shooter {
+public class Shooter{
 
     private static final String TEXTURE_FILE_NAME = "shooter.png";
     private static final Texture texture = new Texture(Gdx.files.internal(TEXTURE_FILE_NAME));
@@ -18,6 +18,8 @@ public class Shooter {
     private float movementSpeed;
 
     private float yVelocity;
+    public int hits;
+
     public Array<Drop> lasers;
     private boolean active;
     private int health;
@@ -25,16 +27,20 @@ public class Shooter {
     private boolean movingRight;
     // Indicateur de direction du déplacement
     private boolean isMovingRight = true;
+    private boolean active;
+    private float health;
+
     public Shooter() {
         shape = new Rectangle(0, 0, texture.getWidth(), texture.getHeight());
-        xVelocity = 200f; // Vitesse horizontale de déplacement (plus petite valeur pour ralentir)
-        yVelocity = 200f; // Vitesse verticale de déplacement
+        xVelocity = 100f; // Vitesse horizontale de déplacement (plus petite valeur pour ralentir)
+        yVelocity = 100f; // Vitesse verticale de déplacement
         movingRight = true; // Commence en se déplaçant vers la droite
-
+        health=100;
         // Position aléatoire à l'intérieur de l'écran
         float randomX = (float) (Math.random() * (Gdx.graphics.getWidth() - shape.width));
         float randomY = (float) (Math.random() * (Gdx.graphics.getHeight() - shape.height));
         shape.setPosition(randomX, randomY);
+        hits=0;
     }
     public void update(float deltaTime) {
         float screenWidth = Gdx.graphics.getWidth();
@@ -96,8 +102,35 @@ public class Shooter {
         return movementSpeed;
     }
 
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void takeDamage(int damage) {
+        health -= damage;
+        hits++;
+        if (hits >= 3) {
+            setActive(false);
+        }
+    }
+
+
+
+
+
+
 
     public void draw(SpriteBatch batch) {
         batch.draw(texture, shape.x, shape.y, shape.width, shape.height);
+    }
+
+
+
+    public float getHealth() {
+        return health;
     }
 }
