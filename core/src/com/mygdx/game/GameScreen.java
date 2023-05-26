@@ -111,6 +111,27 @@ public class GameScreen implements Screen {
         bulletTirs.add(newBullet);
         lastBulletTime = TimeUtils.nanoTime();
     }
+    private void spawn2Bullets() {
+        Bullet newBullet = new Bullet(bullet.getDamage(), ship.shape.x - (ship.shape.getHeight() ),
+                ship.shape.y - (ship.shape.getHeight() / 2), bullet.getSize(), 10, 0);
+        Bullet newBullet2 = new Bullet(bullet.getDamage(), ship.shape.x,
+                ship.shape.y - (ship.shape.getHeight() / 2), bullet.getSize(), 10, 0);
+        bulletTirs.add(newBullet);
+        bulletTirs.add(newBullet2);
+        lastBulletTime = TimeUtils.nanoTime();
+    }
+    private void spawn3Bullets() {
+        Bullet newBullet = new Bullet(bullet.getDamage(), ship.shape.x - (ship.shape.getWidth() / 2),
+                ship.shape.y - (ship.shape.getHeight() / 2), bullet.getSize(), 10, 0);
+        Bullet newBullet2 = new Bullet(bullet.getDamage(), ship.shape.x ,
+                ship.shape.y - (ship.shape.getHeight() / 2), bullet.getSize(), 10, 0);
+        Bullet newBullet3 = new Bullet(bullet.getDamage(), ship.shape.x + (ship.shape.getWidth() / 2),
+                ship.shape.y - (ship.shape.getHeight() / 2), bullet.getSize(), 10, 0);
+        bulletTirs.add(newBullet);
+        bulletTirs.add(newBullet2);
+        bulletTirs.add(newBullet3);
+        lastBulletTime = TimeUtils.nanoTime();
+    }
 
     private void checkCollisions() {
         Array<Drop> dropsCopy = new Array<>(drops);
@@ -138,7 +159,7 @@ public class GameScreen implements Screen {
                 Shooter shooter = shooters.get(i);
                 if (Intersector.overlaps(bulletTir.shape, shooter.shape)) {
                     shooter.takeDamage(bulletTir.getDamage());
-                    bulletTirs.removeValue(bulletTir, true);
+
                     distuctionSound.play();
 
                     Score=Score+20;
@@ -162,6 +183,47 @@ public class GameScreen implements Screen {
             }
         }
     }
+    private void checkDoubleTirsRect() {
+        for (int i = bulletTirs.size - 1; i >= 0; i--) {
+            tirSound.play();
+            Bullet bulletTir = bulletTirs.get(i);
+            bulletTir.shape.y += 25;
+            if (bulletTir.shape.y > 1080) {
+                bulletTirs.removeIndex(i);
+            }
+        }
+    }
+    private void checkDoubleTirsCurv() {
+        for (int i = bulletTirs.size - 1; i >= 0; i--) {
+            tirSound.play();
+            Bullet bulletTir = bulletTirs.get(i);
+            if(i == 0){
+                bulletTir.shape.x -=10;
+            }else{
+                bulletTir.shape.x +=10;
+            }
+            bulletTir.shape.y += 25;
+            if (bulletTir.shape.y > 1080) {
+                bulletTirs.removeIndex(i);
+            }
+        }
+    }
+    private void checkMegaTirsCurv() {
+        for (int i = bulletTirs.size - 1; i >= 0; i--) {
+            tirSound.play();
+            Bullet bulletTir = bulletTirs.get(i);
+            if(i == 0){
+                bulletTir.shape.x -=10;
+            }else if(i == 2){
+                bulletTir.shape.x +=10;
+            }
+            bulletTir.shape.y += 25;
+            if (bulletTir.shape.y > 1080) {
+                bulletTirs.removeIndex(i);
+            }
+        }
+    }
+
     private void update(float delta) {
         Vector3 touchPos = new Vector3();
         touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
@@ -179,10 +241,10 @@ public class GameScreen implements Screen {
         long timeDiff = TimeUtils.nanoTime() - lastDropTime;
         if (timeDiff > 1000000000) {
             spawnRaindrop();
-            spawnBullet();
+            spawn3Bullets();
         }
         checkCollisions();
-        checkTirs();
+        checkMegaTirsCurv();
 
         if (ship.shape.y < 0) ship.shape.setY(0);
         if (ship.shape.y > camera.viewportHeight - ship.shape.height)
