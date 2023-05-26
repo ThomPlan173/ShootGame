@@ -38,6 +38,9 @@ public class GameScreen implements Screen {
     private Array<Drop> raindrops;
     private Array<Bullet> bulletTirs;
     private Shooter[] shooters; // Tableau de shooters
+    private boolean active;
+    private int health;
+    private int hits;
 
     public GameScreen(final DropGame game) {
         this.game = game;
@@ -84,6 +87,7 @@ public class GameScreen implements Screen {
         bulletTirs.add(newBullet);
         lastBulletTime = TimeUtils.nanoTime();
     }
+
 
     private void checkCollisions() {
         Iterator<Drop> dropIterator = drops.iterator();
@@ -207,6 +211,7 @@ public class GameScreen implements Screen {
             }
         }
     }
+
 
     @Override
     public void render(float delta) {
