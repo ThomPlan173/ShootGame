@@ -77,9 +77,10 @@ public class GameScreen implements Screen {
         drops.add(raindrop);
         lastDropTime = TimeUtils.nanoTime();
     }
-    private void spawnBullet() {
 
-        Bullet newBullet = new Bullet(bullet.getDamage(), ship.shape.x - (ship.shape.getHeight()/2), ship.shape.y - (ship.shape.getHeight()/2), bullet.getSize(), 10, 0);
+    private void spawnBullet() {
+        Bullet newBullet = new Bullet(bullet.getDamage(), ship.shape.x - (ship.shape.getHeight() / 2),
+                ship.shape.y - (ship.shape.getHeight() / 2), bullet.getSize(), 10, 0);
         bulletTirs.add(newBullet);
         lastBulletTime = TimeUtils.nanoTime();
     }
@@ -118,18 +119,8 @@ public class GameScreen implements Screen {
         Iterator<Shooter> shooterIterator = Arrays.asList(shooters).iterator();
         while (shooterIterator.hasNext()) {
             Shooter shooter = shooterIterator.next();
-            if (!shooter.isActive()) {
+            if (shooter.getHealth() <= 0) {
                 shooterIterator.remove();
-                continue;
-            }
-
-            Iterator<Bullet> bulletIterator = bulletTirs.iterator();
-            while (bulletIterator.hasNext()) {
-                Bullet bulletTir = bulletIterator.next();
-                if (Intersector.overlaps(bulletTir.shape, shooter.shape)) {
-                    shooter.takeDamage(bulletTir.getDamage());
-                    bulletIterator.remove();
-                }
             }
         }
     }
@@ -144,33 +135,33 @@ public class GameScreen implements Screen {
             }
         }
     }
+
     private void update(float delta) {
         Vector3 touchPos = new Vector3();
         touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
         camera.unproject(touchPos);
 
-
         // Modification des coordonnées du ship (avec celles de la souris)
         ship.shape.setX(touchPos.x - ship.shape.width / 2);
         ship.shape.setY(touchPos.y - ship.shape.height / 2);
 
-
         // ... empêcher que le ship sorte de l'écran
         if (ship.shape.x < 0) ship.shape.setX(0);
         if (ship.shape.x > camera.viewportWidth - ship.shape.width)
-            ship.shape.setX( camera.viewportWidth - ship.shape.width);
+            ship.shape.setX(camera.viewportWidth - ship.shape.width);
 
         long timeDiff = TimeUtils.nanoTime() - lastDropTime;
-        if (timeDiff > 1000000000){
+        if (timeDiff > 1000000000) {
             spawnRaindrop();
             spawnBullet();
         }
         checkCollisions();
+        checkEnemyCollisions();
         checkTirs();
 
         if (ship.shape.y < 0) ship.shape.setY(0);
         if (ship.shape.y > camera.viewportHeight - ship.shape.height)
-            ship.shape.setY( camera.viewportHeight - ship.shape.height);
+            ship.shape.setY(camera.viewportHeight - ship.shape.height);
 
         bullet.update(delta);
 
@@ -204,7 +195,6 @@ public class GameScreen implements Screen {
             }
         }
 
-
         for (Drop drop : drops) {
             if (!drop.isActive()) {
                 // Sélectionner un shooter aléatoire pour le tir
@@ -213,12 +203,10 @@ public class GameScreen implements Screen {
                 // Activer le drop à partir de la position du shooter sélectionné
                 drop.activate(randomShooter.shape.x + randomShooter.shape.width / 2 - drop.shape.width / 2, randomShooter.shape.y);
                 randomShooter.setMovementSpeed(randomShooter.getMovementSpeed() + MathUtils.random(-50, 50));
-
                 break;
             }
         }
     }
-
 
     @Override
     public void render(float delta) {
@@ -234,7 +222,7 @@ public class GameScreen implements Screen {
         game.batch.begin();
 
         // Affichage du ship
-        ship.draw(game.batch) ;
+        ship.draw(game.batch);
         game.font.draw(game.batch, "Life: " + actualLife, 20, 1080 - 20);
         game.batch.end();
         batch.begin();
