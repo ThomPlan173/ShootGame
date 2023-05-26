@@ -1,8 +1,10 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
@@ -10,6 +12,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.mygdx.game.Menu.MainMenuScreen;
 import com.mygdx.game.bullet.Bullet;
 import com.mygdx.game.bullet.Drop;
 import com.mygdx.game.character.Allie;
@@ -38,6 +41,8 @@ public class GameScreen implements Screen {
     private Array<Drop> raindrops;
     private Array<Bullet> bulletTirs;
     private Array<Shooter> shooters;
+    private boolean paused;
+    private Texture pauseIcon;
     // Tableau de shooters
 
     public GameScreen(final DropGame game) {
@@ -55,6 +60,7 @@ public class GameScreen implements Screen {
 
         bullet = new Bullet();
         bullet.setVelocity(200, 300);
+        pauseIcon=new Texture(Gdx.files.internal("pause.png"));
 
         allie = new Allie("thomas", 20, 10, bullet);
         actualLife = allie.getMaxLife();
@@ -126,10 +132,6 @@ public class GameScreen implements Screen {
             }
         }
     }
-
-
-
-
     private void checkTirs() {
         for (int i = bulletTirs.size - 1; i >= 0; i--) {
             Bullet bulletTir = bulletTirs.get(i);
@@ -139,8 +141,6 @@ public class GameScreen implements Screen {
             }
         }
     }
-
-
     private void update(float delta) {
         Vector3 touchPos = new Vector3();
         touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
@@ -224,6 +224,41 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            paused = !paused;
+
+        }
+
+        if (paused) {
+            // Render the pause icon at the center of the screen
+            game.batch.begin();
+            game.batch.draw(pauseIcon, camera.viewportWidth / 2 - pauseIcon.getWidth() / 2 , camera.viewportHeight / 2 - pauseIcon.getHeight() / 2 -100);
+
+            Texture exitButton = new Texture(Gdx.files.internal("exit.png"));
+            float buttonWidth = 400; // Adjust the button width as needed
+            float buttonHeight = 200; // Adjust the button height as needed
+            float buttonX = camera.viewportWidth / 2 - buttonWidth / 2 +150;
+            float buttonY = camera.viewportHeight / 2 - buttonHeight / 2 - 200; // Adjust the button Y position as needed
+            game.batch.draw(exitButton, buttonX, buttonY, buttonWidth, buttonHeight);
+
+            game.batch.end();
+
+            // Handle input for the exit button
+            if (Gdx.input.justTouched()) {
+                float touchX = Gdx.input.getX();
+                float touchY = Gdx.input.getY();
+                Vector3 worldCoordinates = camera.unproject(new Vector3(touchX, touchY, 0));
+                if (worldCoordinates.x >= buttonX && worldCoordinates.x <= buttonX + buttonWidth &&
+                        worldCoordinates.y >= buttonY && worldCoordinates.y <= buttonY + buttonHeight) {
+                    game.setScreen(new MainMenuScreen(game));
+                }
+            }
+            return;  // Skip the game logic and rendering when paused
+        }
+
+
+
         ScreenUtils.clear(0, 0, 0.2f, 1);
 
         update(delta);

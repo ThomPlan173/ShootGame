@@ -1,6 +1,8 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -30,6 +32,11 @@ public class DropGame extends Game {
 	}
 
 	public void render() {
+		if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+			// Forward the escape key press to the active screen
+			getScreen().render(Gdx.graphics.getDeltaTime());
+			return;
+		}
 		super.render(); // important!
 	}
 
