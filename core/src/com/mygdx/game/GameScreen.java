@@ -232,7 +232,7 @@ public class GameScreen implements Screen {
         game.batch.setProjectionMatrix(camera.combined);
 
         game.batch.begin();
-
+        game.scrollingBackground.updateAndRender(delta,game.batch);
         ship.draw(game.batch);
         game.font.draw(game.batch, "Life: " + actualLife, 20, 1080 - 20);
 

@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.Menu.MainMenuScreen;
-import javafx.scene.layout.Background;
 
 public class DropGame extends Game {
 
