@@ -107,5 +107,8 @@ public class Ship {
         batch.draw(texture, shape.x, shape.y, shape.width, shape.height);
     }
 
-
+    public void reduceTaille(){
+        shape.height =  shape.height /2;
+        shape.width = shape.width / 2 ;
+    }
 }
