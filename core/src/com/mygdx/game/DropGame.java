@@ -19,6 +19,8 @@ public class DropGame extends Game {
 	public ScrollingBackground scrollingBackground;
 
 	public void addScreen(Screen screen){
+		font = new BitmapFont(Gdx.files.internal("font.fnt"), Gdx.files.internal("font.png"), false);
+
 		this.screens.add(screen);
 	}
 

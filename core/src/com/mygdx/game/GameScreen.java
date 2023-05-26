@@ -3,15 +3,22 @@ package com.mygdx.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.mygdx.game.Menu.GameOverScreen;
 import com.mygdx.game.Menu.MainMenuScreen;
 import com.mygdx.game.bullet.Bullet;
 import com.mygdx.game.bullet.Drop;
@@ -43,6 +50,12 @@ public class GameScreen implements Screen {
     private Array<Shooter> shooters;
     private boolean paused;
     private Texture pauseIcon;
+    private BitmapFont font;
+    private int Score=0;
+    private Sound distuctionSound;
+    private Sound tirSound;
+
+
     // Tableau de shooters
 
     public GameScreen(final DropGame game) {
@@ -62,10 +75,14 @@ public class GameScreen implements Screen {
         bullet.setVelocity(200, 300);
         pauseIcon=new Texture(Gdx.files.internal("pause.png"));
 
-        allie = new Allie("thomas", 20, 10, bullet);
+        allie = new Allie("thomas", 1, 10, bullet);
         actualLife = allie.getMaxLife();
+        distuctionSound = Gdx.audio.newSound(Gdx.files.internal("distruction.wav"));
+        tirSound=Gdx.audio.newSound(Gdx.files.internal("laser1.wav"));
 
         shooters = new Array<Shooter>();
+        font = new BitmapFont(Gdx.files.internal("font.fnt"), Gdx.files.internal("font.png"), false);
+
         // Tableau de 4 shooters
 
         for (int i = 0; i < 4; i++) {
@@ -122,6 +139,9 @@ public class GameScreen implements Screen {
                 if (Intersector.overlaps(bulletTir.shape, shooter.shape)) {
                     shooter.takeDamage(bulletTir.getDamage());
                     bulletTirs.removeValue(bulletTir, true);
+                    distuctionSound.play();
+
+                    Score=Score+20;
 
                     if (shooter.getHealth() <= 0) {
                         shooters.removeIndex(i);
@@ -134,6 +154,7 @@ public class GameScreen implements Screen {
     }
     private void checkTirs() {
         for (int i = bulletTirs.size - 1; i >= 0; i--) {
+            tirSound.play();
             Bullet bulletTir = bulletTirs.get(i);
             bulletTir.shape.y += 25;
             if (bulletTir.shape.y > 1080) {
@@ -241,9 +262,7 @@ public class GameScreen implements Screen {
             float buttonX = camera.viewportWidth / 2 - buttonWidth / 2 +150;
             float buttonY = camera.viewportHeight / 2 - buttonHeight / 2 - 200; // Adjust the button Y position as needed
             game.batch.draw(exitButton, buttonX, buttonY, buttonWidth, buttonHeight);
-
             game.batch.end();
-
             // Handle input for the exit button
             if (Gdx.input.justTouched()) {
                 float touchX = Gdx.input.getX();
@@ -260,17 +279,18 @@ public class GameScreen implements Screen {
 
 
         ScreenUtils.clear(0, 0, 0.2f, 1);
-
         update(delta);
-
         camera.update();
         game.batch.setProjectionMatrix(camera.combined);
+
 
         game.batch.begin();
         game.scrollingBackground.updateAndRender(delta,game.batch);
         ship.draw(game.batch);
+        game.font.setColor(Color.RED);
         game.font.draw(game.batch, "Life: " + actualLife, 20, 1080 - 20);
-
+        game.font.setColor(Color.BLUE);
+        game.font.draw(game.batch, "Score: " + Score, 1800,1060 );
         update(delta);
 
         for (Drop raindrop : drops) {
@@ -286,12 +306,11 @@ public class GameScreen implements Screen {
         }
 
         game.batch.end();
-
-        // Vérifier la condition après la mise à jour
-        if (actualLife <= 0 && !Gdx.graphics.isFullscreen()) {
-            Gdx.graphics.setWindowedMode(800, 600); // Définir une taille de fenêtre par défaut
-            actualLife = 20; // Réinitialiser la vie du joueur
+        if (actualLife <= 0) {
+            game.setScreen(new GameOverScreen(game, Score));
         }
+
+
     }
 
 
@@ -302,6 +321,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void show() {
+
          }
 
     @Override

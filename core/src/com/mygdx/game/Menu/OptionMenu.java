@@ -37,7 +37,6 @@ public class OptionMenu implements Screen {
 
     public OptionMenu(final DropGame game) {
         this.game = game;
-        this.mainMenuScreen = mainMenuScreen;
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 1920, 990);

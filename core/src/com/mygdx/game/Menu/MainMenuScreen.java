@@ -86,6 +86,7 @@ public class MainMenuScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 game.setScreen(new GameScreen(game));
+                music.stop();
 
             }
         });
@@ -173,8 +174,6 @@ public class MainMenuScreen implements Screen {
         stage.addActor(optionButton);
         stage.addActor(helpButton);
         stage.addActor(exitButton);
-        music.setLooping(true);
-        music.play();
     }
 
     @Override
@@ -191,7 +190,7 @@ public class MainMenuScreen implements Screen {
         font.getData().setScale(2f);
         font.draw(game.batch, "WELCOME TO SHOOT GAME!",650 , 900);
         game.batch.end();
-
+        music.play();
         stage.act();
         stage.draw();
     }
