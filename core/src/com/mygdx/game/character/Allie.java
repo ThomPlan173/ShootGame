@@ -7,7 +7,9 @@ public class Allie extends Character {
     private int attackPower;
 
     public Allie(String name, int maxLife, int attackPower, Bullet bullet) {
-        super(name, maxLife, 0, bullet);
+        super(name, maxLife, attackPower, bullet);
+        setMaxLife(maxLife);
+        setLife(maxLife);
         this.attackPower = attackPower;
     }
 
@@ -17,6 +19,12 @@ public class Allie extends Character {
 
     public void setAttackPower(int attackPower) {
         this.attackPower = attackPower;
+    }
+
+    public Weapon getWeapon() {
+        // Ici, vous pouvez créer et retourner une instance de Weapon
+        // correspondant à l'arme associée à l'allié
+        return new Weapon("Nom de l'arme", 50, 1f);
     }
 
     public void attack(Ennemi ennemi) {

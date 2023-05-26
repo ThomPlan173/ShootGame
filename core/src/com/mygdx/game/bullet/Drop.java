@@ -8,9 +8,9 @@ import com.badlogic.gdx.math.Rectangle;
 public class Drop {
 
     private static final String TEXTURE_FILE_NAME = "lazer.png";
-    static final Texture texture = new Texture(Gdx.files.internal(TEXTURE_FILE_NAME));
+    public static final Texture texture = new Texture(Gdx.files.internal(TEXTURE_FILE_NAME));
 
-    Rectangle shape;
+    public Rectangle shape;
     private float movementSpeed;
     private boolean isActive;
 

@@ -2,14 +2,12 @@ package com.mygdx.game.character;
 
 import com.mygdx.game.bullet.Bullet;
 
-public abstract class  Character {
+public abstract class Character {
 
-    private static String MSG_ALIVE = "(ALIVE)";
-    private static String MSG_DEAD = "(DEAD)";
-    public  Bullet bullet;
-
+    private final static String MSG_ALIVE = "(ALIVE)";
+    private final static String MSG_DEAD = "(DEAD)";
+    public Bullet bullet;
     private String name;
-
 
     private int maxLife, life;
 
@@ -76,9 +74,4 @@ public abstract class  Character {
         }
     }
 
-
-    @Override
-    public String toString() {
-        return String.format("%s has %d/%d life", getName(), getLife(), getMaxLife());
-    }
 }

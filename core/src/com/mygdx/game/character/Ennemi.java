@@ -1,5 +1,5 @@
 package com.mygdx.game.character;
-
+import com.mygdx.game.character.Character;
 import com.mygdx.game.bullet.Bullet;
 
 public class Ennemi extends Character {

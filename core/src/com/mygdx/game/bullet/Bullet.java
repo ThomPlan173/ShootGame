@@ -10,11 +10,16 @@ public class Bullet {
     private static final String TEXTURE_FILE_NAME = "bullet.png";
     private static final Texture texture = new Texture(Gdx.files.internal(TEXTURE_FILE_NAME));
 
-    private Rectangle shape;
+    public Rectangle shape;
     private float xVelocity;
     private float yVelocity;
 
     private int damage;
+    public int getSize() {
+        return size;
+    }
+
+    int size;
 
     public Bullet() {
         shape = new Rectangle(0, 0, texture.getWidth(), texture.getHeight());
@@ -22,7 +27,17 @@ public class Bullet {
         yVelocity = 0;
         damage=0;
     }
+    public Bullet(int damage, float x, float y, int size, int xSpeed, int ySpeed){
+        shape = new Rectangle(0, 0, texture.getWidth(), texture.getHeight()) ;
+        this.damage = damage;
+        this.shape.x = x;
+        this.shape.y = y;
+        this.size = size;
+        this.xVelocity = xSpeed;
+        this.yVelocity = ySpeed;
 
+
+    }
     public void setVelocity(float xVelocity, float yVelocity) {
         this.xVelocity = xVelocity;
         this.yVelocity = yVelocity;
