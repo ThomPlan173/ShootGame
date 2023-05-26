@@ -102,12 +102,6 @@ public class Shooter{
     }
 
 
-
-
-
-
-
-
     public void draw(SpriteBatch batch) {
         batch.draw(texture, shape.x, shape.y, shape.width, shape.height);
     }
