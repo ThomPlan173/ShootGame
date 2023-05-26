@@ -19,6 +19,9 @@ public class Shooter {
 
     private float yVelocity;
     public Array<Drop> lasers;
+    private boolean active;
+    private int health;
+    private int hits;
     private boolean movingRight;
     // Indicateur de direction du déplacement
     private boolean isMovingRight = true;
@@ -56,11 +59,29 @@ public class Shooter {
 
         shape.setPosition(newX, newY);
     }
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void takeDamage(int damage) {
+        health = damage;
+        hits++;
+        if (hits >= 3) {
+            setActive(false);
+        }
+    }
 
     private void shoot() {
         Drop laser = new Drop();
         laser.activate(shape.x + shape.width / 2 - laser.shape.width / 2, shape.y);
         lasers.add(laser); // Ajoute le laser à la liste des lasers tirés
+    }
+    public int getHealth(){
+        return health;
     }
 
     public void changeDirection() {
