@@ -12,9 +12,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.TimeUtils;
@@ -25,23 +22,16 @@ import com.mygdx.game.bullet.Drop;
 import com.mygdx.game.character.Allie;
 import com.mygdx.game.character.Ship;
 import com.mygdx.game.character.Shooter;
-import com.mygdx.game.bullet.Bullet;
-
-import java.util.Arrays;
-import java.util.Iterator;
 
 public class GameScreen implements Screen {
-    private final DropGame game;
-    private OrthographicCamera camera;
-    private SpriteBatch batch;
-    private Ship ship;
+    private final DropGame game; //jeu
+    private final OrthographicCamera camera; //lecture des evenements
+    private final SpriteBatch batch;
+    private final Ship ship; //dessin du ship
 
-    private Character character;
-    private Array<Drop> drops;
-    private long lastDropTime;
-    private int dropsGathered = 0;
-
-    private long lastBulletTime = 0;
+    private Array<Drop> drops; //pluie de balles
+    private long lastDropTime; //temps de drop
+    private long lastBulletTime ;
     private Allie allie;
     private int actualLife;
     private Bullet bullet;
@@ -54,9 +44,6 @@ public class GameScreen implements Screen {
     private int Score=0;
     private Sound distuctionSound;
     private Sound tirSound;
-
-
-    // Tableau de shooters
 
     public GameScreen(final DropGame game) {
         this.game = game;
@@ -75,7 +62,7 @@ public class GameScreen implements Screen {
         bullet.setVelocity(200, 300);
         pauseIcon=new Texture(Gdx.files.internal("pause.png"));
 
-        allie = new Allie("thomas", 1, 10, bullet);
+        allie = new Allie("player", 1, 10, bullet);
         actualLife = allie.getMaxLife();
         distuctionSound = Gdx.audio.newSound(Gdx.files.internal("distruction.wav"));
         tirSound=Gdx.audio.newSound(Gdx.files.internal("laser1.wav"));
@@ -83,11 +70,12 @@ public class GameScreen implements Screen {
         shooters = new Array<Shooter>();
         font = new BitmapFont(Gdx.files.internal("font.fnt"), Gdx.files.internal("font.png"), false);
 
-        // Tableau de 4 shooters
+        // On crée 4 shooters
 
         for (int i = 0; i < 4; i++) {
             Shooter shooter = new Shooter();
 
+            //mouvements random des shooters
             float randomX = MathUtils.random(0, 1920 - shooter.shape.width);
             float randomY = MathUtils.random(200, 1080 - shooter.shape.height);
             shooter.shape.set(randomX, randomY, shooter.shape.width, shooter.shape.height);

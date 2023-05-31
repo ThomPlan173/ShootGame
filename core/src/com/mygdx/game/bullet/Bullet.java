@@ -4,29 +4,30 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
-
+//classe pour les bullet
 public class Bullet {
 
-    private static final String TEXTURE_FILE_NAME = "bullet.png";
-    private static final Texture texture = new Texture(Gdx.files.internal(TEXTURE_FILE_NAME));
+    private static final String TEXTURE_FILE_NAME = "bullet.png"; //image
+    private static final Texture texture = new Texture(Gdx.files.internal(TEXTURE_FILE_NAME)); //texture
 
-    public Rectangle shape;
-    private float xVelocity;
+    public Rectangle shape; //dessin
+    private float xVelocity; //vitesse en x et y
     private float yVelocity;
 
-    private int damage;
+    private int damage; //degats
     public int getSize() {
         return size;
-    }
+    } //size du bullet
 
     int size;
 
-    public Bullet() {
+    public Bullet() { //constructeur par defaut
         shape = new Rectangle(0, 0, texture.getWidth(), texture.getHeight());
         xVelocity = 0;
         yVelocity = 0;
         damage=0;
     }
+    //constructeur plus precis
     public Bullet(int damage, float x, float y, int size, int xSpeed, int ySpeed){
         shape = new Rectangle(0, 0, texture.getWidth(), texture.getHeight()) ;
         this.damage = damage;
@@ -38,6 +39,7 @@ public class Bullet {
 
 
     }
+    //setter de velocité
     public void setVelocity(float xVelocity, float yVelocity) {
         this.xVelocity = xVelocity;
         this.yVelocity = yVelocity;
