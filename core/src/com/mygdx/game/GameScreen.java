@@ -18,6 +18,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.mygdx.game.Menu.GameOverScreen;
 import com.mygdx.game.Menu.MainMenuScreen;
 import com.mygdx.game.bullet.Bullet;
+import com.mygdx.game.character.Interceptor;
 import com.mygdx.game.bullet.Drop;
 import com.mygdx.game.character.Allie;
 import com.mygdx.game.character.Ship;
@@ -38,6 +39,7 @@ public class GameScreen implements Screen {
     private Array<Drop> raindrops;
     private Array<Bullet> bulletTirs;
     private Array<Shooter> shooters;
+    private Array<Interceptor> interceptors;
     private boolean paused;
     private Texture pauseIcon;
     private BitmapFont font;
@@ -68,11 +70,12 @@ public class GameScreen implements Screen {
         tirSound=Gdx.audio.newSound(Gdx.files.internal("laser1.wav"));
 
         shooters = new Array<Shooter>();
+        interceptors = new Array<Interceptor>();
         font = new BitmapFont(Gdx.files.internal("font.fnt"), Gdx.files.internal("font.png"), false);
 
         // On crée 4 shooters
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 5; i++) {
             Shooter shooter = new Shooter();
 
             //mouvements random des shooters
@@ -80,6 +83,14 @@ public class GameScreen implements Screen {
             float randomY = MathUtils.random(200, 1080 - shooter.shape.height);
             shooter.shape.set(randomX, randomY, shooter.shape.width, shooter.shape.height);
             shooters.add(shooter);
+        }
+        for (int j = 0; j < 5; j++) {
+            Interceptor interceptor = new Interceptor();
+
+            float randomx = MathUtils.random(0, 1920 - interceptor.shape.width);
+            float randomy = MathUtils.random(200, 1080 - interceptor.shape.height);
+            interceptor.shape.set(randomx, randomy, interceptor.shape.width, interceptor.shape.height);
+            interceptors.add(interceptor);
         }
     }
 
@@ -296,6 +307,25 @@ public class GameScreen implements Screen {
                 break;
             }
         }
+        if (Score >= 200) {
+            for (Interceptor interceptor : interceptors) {
+                interceptor.update(delta);
+
+                // Vérifier les collisions avec les autres interceptors
+                for (Interceptor otherInterceptor : interceptors) {
+                    if (interceptor != otherInterceptor) {
+                        if (Intersector.overlaps(interceptor.shape, otherInterceptor.shape)) {
+                            // Changer la direction de l'interceptor pour éviter la collision
+                            interceptor.changeDirection();
+                            otherInterceptor.changeDirection();
+                        }
+                    }
+                }
+            }
+        }
+        for (Interceptor interceptor : interceptors) {
+            interceptor.update(delta);
+        }
     }
 
 
@@ -360,13 +390,19 @@ public class GameScreen implements Screen {
         for (Shooter shooter : shooters) {
             shooter.draw(game.batch);
         }
+        if (shooters.size == 0) {
+            // Afficher les intercepteurs
+            for (Interceptor interceptor : interceptors) {
+                interceptor.draw(game.batch);
+            }
+        }
 
-        game.batch.end();
+
         if (actualLife <= 0) {
             game.setScreen(new GameOverScreen(game, Score));
         }
 
-
+        game.batch.end();
     }
 
 

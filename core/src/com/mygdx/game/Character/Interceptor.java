@@ -8,11 +8,10 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.bullet.Drop;
 
-// NB : il y a du code redondant dans Drop et dans Ship : on peut surement faire mieux !
-public class Mothership {
+public class Interceptor{
 
-    private static final String TEXTURE_FILE_NAME = "ship.png" ;
-    public static final Texture texture = new Texture(Gdx.files.internal(TEXTURE_FILE_NAME));
+    private static final String TEXTURE_FILE_NAME = "interceptor.png";
+    private static final Texture texture = new Texture(Gdx.files.internal(TEXTURE_FILE_NAME));
 
     public Rectangle shape;
     private float xVelocity;
@@ -30,7 +29,7 @@ public class Mothership {
 
     private float health;
 
-    public Mothership() {
+    public Interceptor() {
         shape = new Rectangle(0, 0, texture.getWidth(), texture.getHeight());
         xVelocity = 100f; // Vitesse horizontale de déplacement (plus petite valeur pour ralentir)
         yVelocity = 100f; // Vitesse verticale de déplacement
