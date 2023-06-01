@@ -92,13 +92,14 @@ public class GameScreen implements Screen {
         drops.add(raindrop);
         lastDropTime = TimeUtils.nanoTime();
     }
-
+    //Fonction pour faire apparaitre 1 bullet
     private void spawnBullet() {
         Bullet newBullet = new Bullet(bullet.getDamage(), ship.shape.x - (ship.shape.getHeight() / 2),
                 ship.shape.y - (ship.shape.getHeight() / 2), bullet.getSize(), 10, 0);
         bulletTirs.add(newBullet);
         lastBulletTime = TimeUtils.nanoTime();
     }
+    //Spawn 2 bullets à la fois
     private void spawn2Bullets() {
         Bullet newBullet = new Bullet(bullet.getDamage(), ship.shape.x - (ship.shape.getHeight() ),
                 ship.shape.y - (ship.shape.getHeight() / 2), bullet.getSize(), 10, 0);
@@ -108,6 +109,7 @@ public class GameScreen implements Screen {
         bulletTirs.add(newBullet2);
         lastBulletTime = TimeUtils.nanoTime();
     }
+    //span 3 bullets
     private void spawn3Bullets() {
         Bullet newBullet = new Bullet(bullet.getDamage(), ship.shape.x - (ship.shape.getWidth() / 2),
                 ship.shape.y - (ship.shape.getHeight() / 2), bullet.getSize(), 10, 0);
@@ -120,7 +122,7 @@ public class GameScreen implements Screen {
         bulletTirs.add(newBullet3);
         lastBulletTime = TimeUtils.nanoTime();
     }
-
+    //verifier les colisions entre balles ennemis et le vaisseau
     private void checkCollisions() {
         Array<Drop> dropsCopy = new Array<>(drops);
 
@@ -161,6 +163,7 @@ public class GameScreen implements Screen {
             }
         }
     }
+    //check un tir simple
     private void checkTirs() {
         for (int i = bulletTirs.size - 1; i >= 0; i--) {
             tirSound.play();
@@ -171,6 +174,7 @@ public class GameScreen implements Screen {
             }
         }
     }
+    //check double tirs
     private void checkDoubleTirsRect() {
         for (int i = bulletTirs.size - 1; i >= 0; i--) {
             tirSound.play();
@@ -181,6 +185,7 @@ public class GameScreen implements Screen {
             }
         }
     }
+    //checks tirs curvés
     private void checkDoubleTirsCurv() {
         for (int i = bulletTirs.size - 1; i >= 0; i--) {
             tirSound.play();
@@ -196,6 +201,7 @@ public class GameScreen implements Screen {
             }
         }
     }
+    //check tirs de 3 balles
     private void checkMegaTirsCurv() {
         for (int i = bulletTirs.size - 1; i >= 0; i--) {
             tirSound.play();
@@ -211,7 +217,7 @@ public class GameScreen implements Screen {
             }
         }
     }
-
+    //update ou on appelle les fonctions ci-avant
     private void update(float delta) {
         Vector3 touchPos = new Vector3();
         touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
